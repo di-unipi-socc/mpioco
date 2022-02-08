@@ -1,0 +1,52 @@
+<tosca:Definitions xmlns:tosca="http://docs.oasis-open.org/tosca/ns/2011/12" xmlns:winery="http://www.opentosca.org/winery/extensions/tosca/2013/02/12" xmlns:ns1="http://www.eclipse.org/winery/model/selfservice" id="winery-defs-for_socc-DockerMongo" targetNamespace="http://socc.di.unipi.it/names">
+<tosca:Import namespace="http://socc.di.unipi.it/names/propertiesdefinition/winery" location="../imports/http%253A%252F%252Fwww.w3.org%252F2001%252FXMLSchema/http%253A%252F%252Fsocc.di.unipi.it%252Fnames%252Fpropertiesdefinition%252Fwinery/Properties/Properties.xsd" importType="http://www.w3.org/2001/XMLSchema" winery:wpd="true"/>
+<tosca:Import namespace="http://socc.di.unipi.it/names" location="socc__MongoDBCapability.tosca" importType="http://docs.oasis-open.org/tosca/ns/2011/12"/>
+<tosca:Import namespace="http://socc.di.unipi.it/names" location="socc__ContainerCapability.tosca" importType="http://docs.oasis-open.org/tosca/ns/2011/12"/>
+<tosca:Import namespace="http://socc.di.unipi.it/names" location="socc__Docker.tosca" importType="http://docs.oasis-open.org/tosca/ns/2011/12"/>
+<tosca:Import namespace="http://socc.di.unipi.it/names/propertiesdefinition/winery" location="../nodetypes/http%253A%252F%252Fsocc.di.unipi.it%252Fnames/DockerMongo/propertiesdefinition/Properties.xsd" importType="http://www.w3.org/2001/XMLSchema" winery:wpd="true"/>
+<tosca:NodeType name="DockerMongo" abstract="no" final="no" targetNamespace="http://socc.di.unipi.it/names" winery:bordercolor="#fb3e94">
+<winery:PropertiesDefinition elementname="Properties" namespace="http://socc.di.unipi.it/names/propertiesdefinition/winery">
+<winery:properties>
+<winery:key>PortMappings</winery:key>
+<winery:type>xsd:anyURI</winery:type>
+</winery:properties>
+</winery:PropertiesDefinition>
+<tosca:DerivedFrom xmlns:socc="http://socc.di.unipi.it/names" typeRef="socc:Docker"/>
+<tosca:PropertiesDefinition xmlns:ns50="http://socc.di.unipi.it/names/propertiesdefinition/winery" type="ns50:Properties"/>
+<tosca:CapabilityDefinitions>
+<tosca:CapabilityDefinition xmlns:socc="http://socc.di.unipi.it/names" name="MongoEndpoint" capabilityType="socc:MongoDBCapability" lowerBound="0" upperBound="unbounded"/>
+<tosca:CapabilityDefinition xmlns:socc="http://socc.di.unipi.it/names" name="Container" capabilityType="socc:ContainerCapability" lowerBound="0" upperBound="unbounded"/>
+</tosca:CapabilityDefinitions>
+<tosca:InstanceStates>
+<tosca:InstanceState state="Unavailable"/>
+<tosca:InstanceState state="Running">
+<Offers xmlns="http://di.unipi.it/~soldani/mprot">
+<Capability name="MongoEndpoint"/>
+<Capability name="Container"/>
+</Offers>
+</tosca:InstanceState>
+<tosca:InstanceState state="Stopped"/>
+<InstanceState xmlns="http://docs.oasis-open.org/tosca/ns/2011/12" state="Crashed"/>
+</tosca:InstanceStates>
+<tosca:Interfaces>
+<tosca:Interface name="Lifecycle">
+<tosca:Operation name="Run"/>
+<tosca:Operation name="Start"/>
+<tosca:Operation name="Stop"/>
+<tosca:Operation name="Delete"/>
+</tosca:Interface>
+</tosca:Interfaces>
+<ManagementProtocol xmlns="http://di.unipi.it/~soldani/mprot">
+<InitialState state="Unavailable"/>
+<Transitions>
+<Transition sourceState="Unavailable" targetState="Running" operationName="Run" interfaceName="Lifecycle"/>
+<Transition sourceState="Unavailable" targetState="Crashed" operationName="Crash" interfaceName="Special"/>
+<Transition sourceState="Running" targetState="Crashed" operationName="Crash" interfaceName="Special"/>
+<Transition sourceState="Stopped" targetState="Crashed" operationName="Crash" interfaceName="Special"/>
+<Transition sourceState="Running" targetState="Unavailable" operationName="Run" interfaceName="Lifecycle"/>
+<Transition sourceState="Running" targetState="Stopped" operationName="Stop" interfaceName="Lifecycle"/>
+</Transitions>
+<FaultHandlers/>
+</ManagementProtocol>
+</tosca:NodeType>
+</tosca:Definitions>
